@@ -1,14 +1,15 @@
-﻿生成启动时间为 2017/11/2 15:09:01。
-     1>项目“E:\HYX\Develop\HEL\C++\DirectInput\DirectInput\DirectInput.vcxproj”在节点 2 上(Build 个目标)。
+﻿生成启动时间为 2017/12/3 14:02:52。
+     1>项目“E:\HYX\Develop\HEL\C++\DirectInput\DirectInput\DirectInput.vcxproj”在节点 2 上(Rebuild 个目标)。
      1>ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D DIRECTINPUT_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt DirectInput.cpp
          DirectInput.cpp
          c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
        Link:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.dll" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.lib" /MACHINE:X86 /DLL Debug\DirectInput.obj
+            正在创建库 E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.lib 和对象 E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.exp
          DirectInput.vcxproj -> E:\HYX\Develop\HEL\C++\DirectInput\Debug\DirectInput.dll
-     1>已完成生成项目“E:\HYX\Develop\HEL\C++\DirectInput\DirectInput\DirectInput.vcxproj”(Build 个目标)的操作。
+     1>已完成生成项目“E:\HYX\Develop\HEL\C++\DirectInput\DirectInput\DirectInput.vcxproj”(Rebuild 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.00
+已用时间 00:00:01.88

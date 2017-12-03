@@ -1,13 +1,14 @@
 /*
 *     COPYRIGHT NOTICE
-*     Copyright(c) 2017, Alopex/Helium
+*     Copyright(c) 2017, Team Shanghai Dream Equinox
 *     All rights reserved.
 *
 * @file		DirectInput.cpp
 * @brief	This Program is DirectInput DLL Project.
 * @author	Alopex/Helium
 * @version	v1.00a
-* @date		2017-10-27
+* @date		2017-10-27	v1.00a	alopex	Create Project
+*			2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
 */
 #include "DirectCommon.h"
 #include "DirectInput.h"
@@ -226,6 +227,178 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 	return S_OK;//OK
 }
 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+// @Function:	DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags)
+// @Purpose: DirectInput 初始化输入设备(键盘/鼠标/游戏杆)
+// @Since: v1.00a
+// @Para: HWND hWnd(窗口句柄)
+// @Para: HINSTANCE hInstance(窗口实例句柄)
+// @Para: DirectInputDevice eDirectInputDevice_X(枚举类型:键盘/鼠标/游戏杆)
+// @Para: DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags(枚举类型:设备协作级别)
+// @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags)
+{
+	DWORD dwDeviceCoopFlags;
+
+	//创建IDirectInput8接口对象
+	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
+
+	//填充DirectInput设备协作等级
+	switch (eDirectInputDeviceCoopFlags)
+	{
+	case DirectInputCoopFlags_ForeGround_Exclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_ForeGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_BackGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	default:
+		break;
+	}
+
+	//创建IDirectInputDevice8设备接口对象
+	switch (eDirectInputDevice_X)
+	{
+	case DirectInputDevice_KeyBoard:
+		//KeyBoard键盘设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pDirectInputDeviceKeyBoard, NULL));//创建IDirectInputDevice8接口对象(KeyBoard设备对象)
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetCooperativeLevel(hWnd, dwDeviceCoopFlags));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetDataFormat(&c_dfDIKeyboard));//DirectInputDevice设置数据格式(标准键盘结构)
+		VERIFY(m_pDirectInputDeviceKeyBoard->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceKeyBoard->Poll());//DirectInputDevice轮询设备
+		break;
+	case DirectInputDevice_Mouse:
+		//Mouse鼠标设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pDirectInputDeviceMouse, NULL));//创建IDirectInputDevice8接口对象(Mouse鼠标设备对象)
+		VERIFY(m_pDirectInputDeviceMouse->SetCooperativeLevel(hWnd, dwDeviceCoopFlags));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceMouse->SetDataFormat(&c_dfDIMouse));//DirectInputDevice设置数据格式(标准鼠标结构)
+		VERIFY(m_pDirectInputDeviceMouse->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceMouse->Poll());//DirectInputDevice轮询设备
+		break;
+	case DirectInputDevice_JoyStick:
+		//JoyStick游戏杆设备
+		VERIFY(m_pDirectInput->EnumDevices(DI8DEVTYPE_JOYSTICK, DirectInputEnumJoySticks, &g_JoyStickGUID, DIEDFL_ATTACHEDONLY));//枚举JoyStick游戏杆设备GUID
+		VERIFY(m_pDirectInput->CreateDevice(g_JoyStickGUID, &m_pDirectInputDeviceJoyStick, NULL));//创建IDirectInputDevice8接口对象(JoyStick游戏杆设备对象)
+		VERIFY(m_pDirectInputDeviceJoyStick->SetCooperativeLevel(hWnd, dwDeviceCoopFlags));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceJoyStick->SetDataFormat(&c_dfDIJoystick));//DirectInputDevice设置数据格式(标准游戏杆结构)
+		VERIFY(m_pDirectInputDeviceJoyStick->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceJoyStick->Poll());//DirectInputDevice轮询设备
+		break;
+	default:
+		break;
+	}
+
+	return S_OK;//OK
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// @Function:	DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2)
+// @Purpose: DirectInput 初始化输入设备(键盘/鼠标/游戏杆)
+// @Since: v1.00a
+// @Para: HWND hWnd(窗口句柄)
+// @Para: HINSTANCE hInstance(窗口实例句柄)
+// @Para: DirectInputDevice eDirectInputDevice_X(枚举类型:键盘/鼠标/游戏杆)
+// @Para: DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1(枚举类型:设备协作级别)
+// @Para: DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2(枚举类型:设备协作级别)
+// @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2)
+{
+	DWORD dwDeviceCoopFlags1;
+	DWORD dwDeviceCoopFlags2;
+
+	//创建IDirectInput8接口对象
+	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
+
+	//填充DirectInput设备协作等级
+	switch (eDirectInputDeviceCoopFlags1)
+	{
+	case DirectInputCoopFlags_ForeGround_Exclusive:
+		dwDeviceCoopFlags1 = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_ForeGround_NoExclusive:
+		dwDeviceCoopFlags1 = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_BackGround_NoExclusive:
+		dwDeviceCoopFlags1 = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	default:
+		break;
+	}
+
+	switch (eDirectInputDeviceCoopFlags2)
+	{
+	case DirectInputCoopFlags_ForeGround_Exclusive:
+		dwDeviceCoopFlags2 = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_ForeGround_NoExclusive:
+		dwDeviceCoopFlags2 = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_BackGround_NoExclusive:
+		dwDeviceCoopFlags2 = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	default:
+		break;
+	}
+
+	//创建IDirectInputDevice8设备接口对象
+	switch (eDirectInputMulDevice_X)
+	{
+	case DirectInputDevice_KeyBoard_Mouse:
+		//KeyBoard键盘设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pDirectInputDeviceKeyBoard, NULL));//创建IDirectInputDevice8接口对象(KeyBoard设备对象)
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetCooperativeLevel(hWnd, dwDeviceCoopFlags1));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetDataFormat(&c_dfDIKeyboard));//DirectInputDevice设置数据格式(标准键盘结构)
+		VERIFY(m_pDirectInputDeviceKeyBoard->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceKeyBoard->Poll());//DirectInputDevice轮询设备
+		//Mouse鼠标设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pDirectInputDeviceMouse, NULL));//创建IDirectInputDevice8接口对象(Mouse鼠标设备对象)
+		VERIFY(m_pDirectInputDeviceMouse->SetCooperativeLevel(hWnd, dwDeviceCoopFlags2));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceMouse->SetDataFormat(&c_dfDIMouse));//DirectInputDevice设置数据格式(标准鼠标结构)
+		VERIFY(m_pDirectInputDeviceMouse->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceMouse->Poll());//DirectInputDevice轮询设备
+		break;
+	case DirectInputDevice_KeyBoard_JoyStick:
+		//KeyBoard键盘设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pDirectInputDeviceKeyBoard, NULL));//创建IDirectInputDevice8接口对象(KeyBoard设备对象)
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetCooperativeLevel(hWnd, dwDeviceCoopFlags1));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceKeyBoard->SetDataFormat(&c_dfDIKeyboard));//DirectInputDevice设置数据格式(标准键盘结构)
+		VERIFY(m_pDirectInputDeviceKeyBoard->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceKeyBoard->Poll());//DirectInputDevice轮询设备
+		//JoyStick游戏杆设备
+		VERIFY(m_pDirectInput->EnumDevices(DI8DEVTYPE_JOYSTICK, DirectInputEnumJoySticks, &g_JoyStickGUID, DIEDFL_ATTACHEDONLY));//枚举JoyStick游戏杆设备GUID
+		VERIFY(m_pDirectInput->CreateDevice(g_JoyStickGUID, &m_pDirectInputDeviceJoyStick, NULL));//创建IDirectInputDevice8接口对象(JoyStick游戏杆设备对象)
+		VERIFY(m_pDirectInputDeviceJoyStick->SetCooperativeLevel(hWnd, dwDeviceCoopFlags2));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceJoyStick->SetDataFormat(&c_dfDIJoystick));//DirectInputDevice设置数据格式(标准游戏杆结构)
+		VERIFY(m_pDirectInputDeviceJoyStick->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceJoyStick->Poll());//DirectInputDevice轮询设备
+		break;
+	case DirectInputDevice_Mouse_JoyStick:
+		//Mouse鼠标设备
+		VERIFY(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pDirectInputDeviceMouse, NULL));//创建IDirectInputDevice8接口对象(Mouse鼠标设备对象)
+		VERIFY(m_pDirectInputDeviceMouse->SetCooperativeLevel(hWnd, dwDeviceCoopFlags1));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceMouse->SetDataFormat(&c_dfDIMouse));//DirectInputDevice设置数据格式(标准鼠标结构)
+		VERIFY(m_pDirectInputDeviceMouse->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceMouse->Poll());//DirectInputDevice轮询设备
+		//JoyStick游戏杆设备
+		VERIFY(m_pDirectInput->EnumDevices(DI8DEVTYPE_JOYSTICK, DirectInputEnumJoySticks, &g_JoyStickGUID, DIEDFL_ATTACHEDONLY));//枚举JoyStick游戏杆设备GUID
+		VERIFY(m_pDirectInput->CreateDevice(g_JoyStickGUID, &m_pDirectInputDeviceJoyStick, NULL));//创建IDirectInputDevice8接口对象(JoyStick游戏杆设备对象)
+		VERIFY(m_pDirectInputDeviceJoyStick->SetCooperativeLevel(hWnd, dwDeviceCoopFlags2));//DirectInputDevice设置协作级别
+		VERIFY(m_pDirectInputDeviceJoyStick->SetDataFormat(&c_dfDIJoystick));//DirectInputDevice设置数据格式(标准游戏杆结构)
+		VERIFY(m_pDirectInputDeviceJoyStick->Acquire());//DirectInputDevice获取设备控制权
+		VERIFY(m_pDirectInputDeviceJoyStick->Poll());//DirectInputDevice轮询设备
+		break;
+	default:
+		break;
+	}
+
+	return S_OK;//OK
+}
+
 //------------------------------------------------------------------------
 // @Function:	DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance)
 // @Purpose: DirectInput 初始化输入设备(键盘)
@@ -273,6 +446,48 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 	return S_OK;//OK
 }
 
+//------------------------------------------------------------------------------------------------------------------
+// @Function:	DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+// @Purpose: DirectInput 初始化输入设备(键盘)
+// @Since: v1.00a
+// @Para: HWND hWnd(窗口句柄)
+// @Para: HINSTANCE hInstance(窗口实例句柄)
+// @Para: DirectInputDeviceCoopFlags eDeviceCoopFlags(枚举类型:设备协作级别)
+// @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
+//------------------------------------------------------------------------------------------------------------------
+HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+{
+	DWORD dwDeviceCoopFlags;
+
+	//创建IDirectInput8接口对象
+	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
+
+	//填充DirectInput设备协作等级
+	switch (eDeviceCoopFlags)
+	{
+	case DirectInputCoopFlags_ForeGround_Exclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_ForeGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_BackGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	default:
+		break;
+	}
+
+	//创建KeyBoard键盘设备
+	VERIFY(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pDirectInputDeviceKeyBoard, NULL));//创建IDirectInputDevice8接口对象(KeyBoard设备对象)
+	VERIFY(m_pDirectInputDeviceKeyBoard->SetCooperativeLevel(hWnd, dwDeviceCoopFlags));//DirectInputDevice设置协作级别
+	VERIFY(m_pDirectInputDeviceKeyBoard->SetDataFormat(&c_dfDIKeyboard));//DirectInputDevice设置数据格式(标准键盘结构)
+	VERIFY(m_pDirectInputDeviceKeyBoard->Acquire());//DirectInputDevice获取设备控制权
+	VERIFY(m_pDirectInputDeviceKeyBoard->Poll());//DirectInputDevice轮询设备
+
+	return S_OK;//OK
+}
+
 //------------------------------------------------------------------------
 // @Function:	DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
 // @Purpose: DirectInput 初始化输入设备(鼠标)
@@ -309,6 +524,48 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance,
 {
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
+
+	//Mouse鼠标设备
+	VERIFY(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pDirectInputDeviceMouse, NULL));//创建IDirectInputDevice8接口对象(Mouse鼠标设备对象)
+	VERIFY(m_pDirectInputDeviceMouse->SetCooperativeLevel(hWnd, dwDeviceCoopFlags));//DirectInputDevice设置协作级别
+	VERIFY(m_pDirectInputDeviceMouse->SetDataFormat(&c_dfDIMouse));//DirectInputDevice设置数据格式(标准鼠标结构)
+	VERIFY(m_pDirectInputDeviceMouse->Acquire());//DirectInputDevice获取设备控制权
+	VERIFY(m_pDirectInputDeviceMouse->Poll());//DirectInputDevice轮询设备
+
+	return S_OK;//OK
+}
+
+//---------------------------------------------------------------------------------------------------------------
+// @Function:	DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+// @Purpose: DirectInput 初始化输入设备(鼠标)
+// @Since: v1.00a
+// @Para: HWND hWnd(窗口句柄)
+// @Para: HINSTANCE hInstance(窗口实例句柄)
+// @Para: DirectInputDeviceCoopFlags eDeviceCoopFlags(枚举类型:设备协作级别)
+// @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
+//---------------------------------------------------------------------------------------------------------------
+HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+{
+	DWORD dwDeviceCoopFlags;
+
+	//创建IDirectInput8接口对象
+	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
+
+	//填充DirectInput设备协作等级
+	switch (eDeviceCoopFlags)
+	{
+	case DirectInputCoopFlags_ForeGround_Exclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_ForeGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	case DirectInputCoopFlags_BackGround_NoExclusive:
+		dwDeviceCoopFlags = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+		break;
+	default:
+		break;
+	}
 
 	//Mouse鼠标设备
 	VERIFY(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pDirectInputDeviceMouse, NULL));//创建IDirectInputDevice8接口对象(Mouse鼠标设备对象)
@@ -482,34 +739,34 @@ float WINAPI DirectInput::DIMouseGetZ(void) const
 	return (float)m_DIMouseState.lZ;
 }
 
-//--------------------------------------------------------------
+//---------------------------------------------------------------------------
 // @Function:	DIKeyDownProc(int nKeyValue, KeyDownProc)
 // @Purpose: DirectInput 读取KeyBoard键盘设备按键状态(处理按键响应)
 // @Since: v1.00a
 // @Para: int nKeyValue(KeyBoard键值)(eg:DIK_A)
-// @Para: KeyDownProc(KeyBoard按键回调函数)
+// @Para: LPCALLBACKKEYDOWNPROCFUNC pCallBackKeyDownProc(KeyBoard按键回调函数)
 // @Return: None
-//--------------------------------------------------------------
-void CALLBACK DirectInput::DIKeyDownProc(int nKeyValue, KeyDownProc)
+//---------------------------------------------------------------------------
+void CALLBACK DirectInput::DIKeyDownProc(int nKeyValue, LPCALLBACKKEYDOWNPROCFUNC pCallBackKeyDownProc)
 {
 	if (m_cKeyBoradBuffer[nKeyValue] & 0x80)
 	{
-		KeyDownProc();//KeyProc
+		(*pCallBackKeyDownProc)();//KeyProc
 	}
 }
 
-//--------------------------------------------------------------
-// @Function:	DIMouseDownProc(DirectInputMouseState eDIMouse_XButton, MouseDownProc)
+//-------------------------------------------------------------------------------------------------------------------------
+// @Function:	DIMouseDownProc(DirectInputMouseState eDIMouse_XButton, LPCALLBACKMOUSEDOWNPROCFUNC pCallBackMouseDownProc)
 // @Purpose: DirectInput 读取Mouse鼠标设备按键状态(处理按键响应)
 // @Since: v1.00a
 // @Para: DirectInputMouseState eDIMouse_XButton(鼠标键值)
-// @Para: MouseDownProc(Mouse按键回调函数)
+// @Para: LPCALLBACKMOUSEDOWNPROCFUNC pCallBackMouseDownProc(Mouse按键回调函数)
 // @Return: None
-//--------------------------------------------------------------
-void CALLBACK DirectInput::DIMouseDownProc(DirectInputMouseState eDIMouse_XButton, MouseDownProc)
+//-------------------------------------------------------------------------------------------------------------------------
+void CALLBACK DirectInput::DIMouseDownProc(DirectInputMouseState eDIMouse_XButton, LPCALLBACKMOUSEDOWNPROCFUNC pCallBackMouseDownProc)
 {
 	if (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80)
 	{
-		MouseDownProc();//MouseProc
+		(*pCallBackMouseDownProc)();//MouseProc
 	}
 }
