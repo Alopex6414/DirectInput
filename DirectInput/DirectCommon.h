@@ -1,6 +1,6 @@
 /*
 *     COPYRIGHT NOTICE
-*     Copyright(c) 2017, Alopex/Helium
+*     Copyright(c) 2017, Team Shanghai Dream Equinox
 *     All rights reserved.
 *
 * @file		DirectCommon.h

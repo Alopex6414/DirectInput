@@ -6,9 +6,9 @@
 * @file		DirectInput.cpp
 * @brief	This Program is DirectInput DLL Project.
 * @author	Alopex/Helium
-* @version	v1.00a
+* @version	v1.01a
 * @date		2017-10-27	v1.00a	alopex	Create Project
-*			2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
+* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
 */
 #include "DirectCommon.h"
 #include "DirectInput.h"

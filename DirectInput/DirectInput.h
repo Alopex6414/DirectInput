@@ -8,7 +8,7 @@
 * @author	Alopex/Helium
 * @version	v1.01a
 * @date		2017-10-27	v1.00a	alopex	Create Project
-*			2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
+* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
 */
 #pragma once
 
