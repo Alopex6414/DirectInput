@@ -6,13 +6,16 @@
 * @file		DirectInput.cpp
 * @brief	This Program is DirectInput DLL Project.
 * @author	Alopex/Helium
-* @version	v1.11a
-* @date		2017-10-27	v1.00a	alopex	Create Project
-* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
-* @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
+* @version	v1.21a
+* @date		2017-10-27	v1.00a	alopex	Create Project.
+* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function.
+* @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library.
+* @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
+* @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
 */
 #include "DirectCommon.h"
 #include "DirectInput.h"
+#include "DirectThreadSafe.h"
 
 GUID g_JoyStickGUID;	//JoyStick GUID
 char g_cJoyStickName[JOYSTICK_ARRAYSIZE]; //JoyStick Name Array
@@ -26,6 +29,9 @@ char g_cJoyStickName[JOYSTICK_ARRAYSIZE]; //JoyStick Name Array
 //------------------------------------------------------------------
 DirectInput::DirectInput()
 {
+	m_bThreadSafe = true;									//线程安全
+	if (m_bThreadSafe) InitializeCriticalSection(&m_cs);	//初始化临界区
+
 	m_pDirectInput = NULL;					//IDirectInput8接口对象指针初始化(NULL)
 	m_pDirectInputDeviceKeyBoard = NULL;	//IDirectInputDevice8 KeyBoard键盘设备指针初始化(NULL)
 	m_pDirectInputDeviceMouse = NULL;		//IDirectInputDevice8 Mouse鼠标设备指针初始化(NULL)
@@ -61,6 +67,8 @@ DirectInput::~DirectInput()
 	SAFE_RELEASE(m_pDirectInputDeviceKeyBoard);//KeyBoard键盘设备释放
 	SAFE_RELEASE(m_pDirectInputDeviceJoyStick);//JoyStick游戏杆设备释放
 	SAFE_RELEASE(m_pDirectInput);//DirectInput释放
+
+	if (m_bThreadSafe) DeleteCriticalSection(&m_cs);	//删除临界区
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -88,6 +96,8 @@ BOOL WINAPI DirectInputEnumJoySticks(LPCDIDEVICEINSTANCE pDirectDeviceInstance, 
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -120,6 +130,8 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance)
 //------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DWORD dwDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -171,6 +183,8 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DWORD dwDeviceCoopFlags1, DWORD dwDeviceCoopFlags2)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -240,6 +254,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
 
 	//创建IDirectInput8接口对象
@@ -309,6 +324,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags1;
 	DWORD dwDeviceCoopFlags2;
 
@@ -410,6 +426,8 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -434,6 +452,8 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 //----------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -458,6 +478,7 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 //------------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
 
 	//创建IDirectInput8接口对象
@@ -499,6 +520,8 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -523,6 +546,8 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
 //----------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectInput8接口对象
 	VERIFY(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, NULL));
 
@@ -547,6 +572,7 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance,
 //---------------------------------------------------------------------------------------------------------------
 HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
 
 	//创建IDirectInput8接口对象
@@ -587,6 +613,7 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance,
 //-------------------------------------------------------------------------------
 void WINAPI DirectInput::DirectInputGetDeviceState(void) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HRESULT hr;
 
 	//获取KeyBoard键盘设备状态
@@ -617,6 +644,7 @@ void WINAPI DirectInput::DirectInputGetDeviceState(void) const
 //-------------------------------------------------------------------------------
 void WINAPI DirectInput::DirectInputGetDeviceState(DirectInputDevice eDirectInputDevice_X) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HRESULT hr;
 
 	switch (eDirectInputDevice_X)
@@ -665,6 +693,7 @@ void WINAPI DirectInput::DirectInputGetDeviceState(DirectInputDevice eDirectInpu
 //--------------------------------------------------------------
 bool WINAPI DirectInput::DIKeyBoardIsDown(int nKeyValue) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_cKeyBoradBuffer[nKeyValue] & 0x80) ? true : false;
 }
 
@@ -677,6 +706,7 @@ bool WINAPI DirectInput::DIKeyBoardIsDown(int nKeyValue) const
 //--------------------------------------------------------------
 bool WINAPI DirectInput::DIKeyBoardIsUp(int nKeyValue) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_cKeyBoradBuffer[nKeyValue] & 0x80) ? false : true;
 }
 
@@ -689,6 +719,7 @@ bool WINAPI DirectInput::DIKeyBoardIsUp(int nKeyValue) const
 //-------------------------------------------------------------------------
 bool WINAPI DirectInput::DIMouseIsDown(DirectInputMouseState eDIMouse_XButton) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80) ? true : false;
 }
 
@@ -701,6 +732,7 @@ bool WINAPI DirectInput::DIMouseIsDown(DirectInputMouseState eDIMouse_XButton) c
 //-------------------------------------------------------------------------
 bool WINAPI DirectInput::DIMouseIsUp(DirectInputMouseState eDIMouse_XButton) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80) ? false : true;
 }
 
@@ -713,6 +745,7 @@ bool WINAPI DirectInput::DIMouseIsUp(DirectInputMouseState eDIMouse_XButton) con
 //-------------------------------------------------------------------------
 float WINAPI DirectInput::DIMouseGetX(void) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lX;
 }
 
@@ -725,6 +758,7 @@ float WINAPI DirectInput::DIMouseGetX(void) const
 //-------------------------------------------------------------------------
 float WINAPI DirectInput::DIMouseGetY(void) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lY;
 }
 
@@ -737,6 +771,7 @@ float WINAPI DirectInput::DIMouseGetY(void) const
 //-------------------------------------------------------------------------
 float WINAPI DirectInput::DIMouseGetZ(void) const
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lZ;
 }
 
@@ -750,6 +785,8 @@ float WINAPI DirectInput::DIMouseGetZ(void) const
 //---------------------------------------------------------------------------
 void CALLBACK DirectInput::DIKeyDownProc(int nKeyValue, LPCALLBACKKEYDOWNPROCFUNC pCallBackKeyDownProc)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	if (m_cKeyBoradBuffer[nKeyValue] & 0x80)
 	{
 		(*pCallBackKeyDownProc)();//KeyProc
@@ -766,6 +803,8 @@ void CALLBACK DirectInput::DIKeyDownProc(int nKeyValue, LPCALLBACKKEYDOWNPROCFUN
 //-------------------------------------------------------------------------------------------------------------------------
 void CALLBACK DirectInput::DIMouseDownProc(DirectInputMouseState eDIMouse_XButton, LPCALLBACKMOUSEDOWNPROCFUNC pCallBackMouseDownProc)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	if (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80)
 	{
 		(*pCallBackMouseDownProc)();//MouseProc

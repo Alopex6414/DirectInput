@@ -21,6 +21,9 @@
     <ClInclude Include="DirectCommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DirectThreadSafe.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectInput.cpp">

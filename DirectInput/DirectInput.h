@@ -6,10 +6,12 @@
 * @file		DirectInput.h
 * @brief	This Program is DirectInput DLL Project.
 * @author	Alopex/Helium
-* @version	v1.11a
-* @date		2017-10-27	v1.00a	alopex	Create Project
-* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function
-* @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
+* @version	v1.21a
+* @date		2017-10-27	v1.00a	alopex	Create Project.
+* @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function.
+* @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library.
+* @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
+* @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
 */
 #pragma once
 
@@ -75,6 +77,9 @@ private:
 	DIMOUSESTATE m_DIMouseState;	//Mouse State Struct(Êó±ê×´Ì¬)
 	DIJOYSTATE m_DIJoyStickState;	//JoyStick State Struct(ÓÎÏ·¸Ë×´Ì¬)
 	char m_cKeyBoradBuffer[KEYBOARD_ARRAYSIZE]; //KeyBoard State Array(¼üÅÌ×´Ì¬)
+
+	CRITICAL_SECTION m_cs;			//Thread Safe(CriticalSection)
+	bool m_bThreadSafe;				//Thread Safe Status
 
 public:
 	DirectInput();	//DirectInput Constructor Function(¹¹Ôìº¯Êý)
