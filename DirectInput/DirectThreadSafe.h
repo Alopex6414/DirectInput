@@ -36,19 +36,4 @@ public:
 	~DirectThreadSafe();
 };
 
-//DirectThreadSafe构造函数
-DirectThreadSafe::DirectThreadSafe(const CRITICAL_SECTION* pCriticalSection, const bool bThreadSafe)
-{
-	m_pCriticalSection = (CRITICAL_SECTION*)pCriticalSection;
-	m_bThreadSafe = bThreadSafe;
-
-	if (m_bThreadSafe) EnterCriticalSection(m_pCriticalSection);
-}
-
-//DirectThreadSafe析构函数
-DirectThreadSafe::~DirectThreadSafe()
-{
-	if (m_bThreadSafe) LeaveCriticalSection(m_pCriticalSection);
-}
-
 #endif
