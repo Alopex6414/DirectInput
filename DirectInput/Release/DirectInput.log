@@ -1,4 +1,4 @@
-﻿生成启动时间为 2018/2/12 14:38:18。
+﻿生成启动时间为 2018/4/12 12:59:02。
      1>项目“E:\HYX\Develop\HEL\C++\DirectInput\DirectInput\DirectInput.vcxproj”在节点 2 上(Rebuild 个目标)。
      1>ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Ot /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D DIRECTINPUT_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt DirectInput.cpp DirectThreadSafe.cpp
@@ -17,4 +17,4 @@
 
 生成成功。
 
-已用时间 00:00:01.18
+已用时间 00:00:01.79

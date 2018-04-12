@@ -6,12 +6,13 @@
 * @file		DirectInput.cpp
 * @brief	This Program is DirectInput DLL Project.
 * @author	Alopex/Helium
-* @version	v1.21a
+* @version	v1.22a
 * @date		2017-10-27	v1.00a	alopex	Create Project.
 * @date		2017-12-3	v1.01a	alopex	Add Enum & Modify CallBack Function.
 * @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library.
 * @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
 * @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
+* @date		2018-4-12	v1.22a	alopex	Add Macro Call Mode.
 */
 #include "DirectCommon.h"
 #include "DirectInput.h"
@@ -79,7 +80,7 @@ DirectInput::~DirectInput()
 // @Para: LPVOID pGUID_Ptr(DirectInput设备全局唯一标识符字符指针)
 // @Return: DIENUM_STOP(停止枚举)
 //----------------------------------------------------------------------------------------------------
-BOOL WINAPI DirectInputEnumJoySticks(LPCDIDEVICEINSTANCE pDirectDeviceInstance, LPVOID pGUID_Ptr)
+BOOL DIRECTINPUT_CALLMODE DirectInputEnumJoySticks(LPCDIDEVICEINSTANCE pDirectDeviceInstance, LPVOID pGUID_Ptr)
 {
 	*(GUID*)pGUID_Ptr = pDirectDeviceInstance->guidInstance;
 	strcpy_s(g_cJoyStickName, (char*)pDirectDeviceInstance->tszProductName);
@@ -94,7 +95,7 @@ BOOL WINAPI DirectInputEnumJoySticks(LPCDIDEVICEINSTANCE pDirectDeviceInstance, 
 // @Para: HINSTANCE hInstance(窗口实例句柄)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -128,7 +129,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance)
 // @Para: DWORD dwDeviceCoopFlags(设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DWORD dwDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DWORD dwDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -181,7 +182,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 // @Para: DWORD dwDeviceCoopFlags2(设备2协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DWORD dwDeviceCoopFlags1, DWORD dwDeviceCoopFlags2)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DWORD dwDeviceCoopFlags1, DWORD dwDeviceCoopFlags2)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -252,7 +253,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 // @Para: DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags(枚举类型:设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputDevice eDirectInputDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
@@ -322,7 +323,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 // @Para: DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2(枚举类型:设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, DirectInputMulDevice eDirectInputMulDevice_X, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags1, DirectInputDeviceCoopFlags eDirectInputDeviceCoopFlags2)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags1;
@@ -424,7 +425,7 @@ HRESULT WINAPI DirectInput::DirectInputInit(HWND hWnd, HINSTANCE hInstance, Dire
 // @Para: HINSTANCE hInstance(窗口实例句柄)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -450,7 +451,7 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 // @Para: DWORD dwDeviceCoopFlags(设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //----------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -476,7 +477,7 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 // @Para: DirectInputDeviceCoopFlags eDeviceCoopFlags(枚举类型:设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
@@ -518,7 +519,7 @@ HRESULT WINAPI DirectInput::DirectInputKeyBoardInit(HWND hWnd, HINSTANCE hInstan
 // @Para: HINSTANCE hInstance(窗口实例句柄)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -544,7 +545,7 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance)
 // @Para: DWORD dwDeviceCoopFlags(设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //----------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DWORD dwDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -570,7 +571,7 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance,
 // @Para: DirectInputDeviceCoopFlags eDeviceCoopFlags(枚举类型:设备协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //---------------------------------------------------------------------------------------------------------------
-HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
+HRESULT DIRECTINPUT_CALLMODE DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance, DirectInputDeviceCoopFlags eDeviceCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwDeviceCoopFlags;
@@ -611,7 +612,7 @@ HRESULT WINAPI DirectInput::DirectInputMouseInit(HWND hWnd, HINSTANCE hInstance,
 // @Para: None
 // @Return: None
 //-------------------------------------------------------------------------------
-void WINAPI DirectInput::DirectInputGetDeviceState(void) const
+void DIRECTINPUT_CALLMODE DirectInput::DirectInputGetDeviceState(void) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HRESULT hr;
@@ -642,7 +643,7 @@ void WINAPI DirectInput::DirectInputGetDeviceState(void) const
 // @Para: DirectInputDevice eDirectInputDevice_X(枚举类型:键盘/鼠标/游戏杆)
 // @Return: None
 //-------------------------------------------------------------------------------
-void WINAPI DirectInput::DirectInputGetDeviceState(DirectInputDevice eDirectInputDevice_X) const
+void DIRECTINPUT_CALLMODE DirectInput::DirectInputGetDeviceState(DirectInputDevice eDirectInputDevice_X) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HRESULT hr;
@@ -691,7 +692,7 @@ void WINAPI DirectInput::DirectInputGetDeviceState(DirectInputDevice eDirectInpu
 // @Para: int nKeyValue(KeyBoard键值)(eg:DIK_A)
 // @Return: bool(true:KeyDown,false:KeyUp)
 //--------------------------------------------------------------
-bool WINAPI DirectInput::DIKeyBoardIsDown(int nKeyValue) const
+bool DIRECTINPUT_CALLMODE DirectInput::DIKeyBoardIsDown(int nKeyValue) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_cKeyBoradBuffer[nKeyValue] & 0x80) ? true : false;
@@ -704,7 +705,7 @@ bool WINAPI DirectInput::DIKeyBoardIsDown(int nKeyValue) const
 // @Para: int nKeyValue(KeyBoard键值)(eg:DIK_A)
 // @Return: bool(true:KeyUp,false:KeyDown)
 //--------------------------------------------------------------
-bool WINAPI DirectInput::DIKeyBoardIsUp(int nKeyValue) const
+bool DIRECTINPUT_CALLMODE DirectInput::DIKeyBoardIsUp(int nKeyValue) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_cKeyBoradBuffer[nKeyValue] & 0x80) ? false : true;
@@ -717,7 +718,7 @@ bool WINAPI DirectInput::DIKeyBoardIsUp(int nKeyValue) const
 // @Para: DirectInputMouseState eDIMouse_XButton(鼠标键值)
 // @Return: bool(true:MouseDown,false:MouseUp)
 //-------------------------------------------------------------------------
-bool WINAPI DirectInput::DIMouseIsDown(DirectInputMouseState eDIMouse_XButton) const
+bool DIRECTINPUT_CALLMODE DirectInput::DIMouseIsDown(DirectInputMouseState eDIMouse_XButton) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80) ? true : false;
@@ -730,7 +731,7 @@ bool WINAPI DirectInput::DIMouseIsDown(DirectInputMouseState eDIMouse_XButton) c
 // @Para: DirectInputMouseState eDIMouse_XButton(鼠标键值)
 // @Return: bool(true:MouseUp,false:MouseDown)
 //-------------------------------------------------------------------------
-bool WINAPI DirectInput::DIMouseIsUp(DirectInputMouseState eDIMouse_XButton) const
+bool DIRECTINPUT_CALLMODE DirectInput::DIMouseIsUp(DirectInputMouseState eDIMouse_XButton) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (m_DIMouseState.rgbButtons[eDIMouse_XButton] & 0x80) ? false : true;
@@ -743,7 +744,7 @@ bool WINAPI DirectInput::DIMouseIsUp(DirectInputMouseState eDIMouse_XButton) con
 // @Para: None
 // @Return: float(Mouse鼠标X轴坐标)
 //-------------------------------------------------------------------------
-float WINAPI DirectInput::DIMouseGetX(void) const
+float DIRECTINPUT_CALLMODE DirectInput::DIMouseGetX(void) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lX;
@@ -756,7 +757,7 @@ float WINAPI DirectInput::DIMouseGetX(void) const
 // @Para: None
 // @Return: float(Mouse鼠标Y轴坐标)
 //-------------------------------------------------------------------------
-float WINAPI DirectInput::DIMouseGetY(void) const
+float DIRECTINPUT_CALLMODE DirectInput::DIMouseGetY(void) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lY;
@@ -769,7 +770,7 @@ float WINAPI DirectInput::DIMouseGetY(void) const
 // @Para: None
 // @Return: float(Mouse鼠标Z轴坐标)
 //-------------------------------------------------------------------------
-float WINAPI DirectInput::DIMouseGetZ(void) const
+float DIRECTINPUT_CALLMODE DirectInput::DIMouseGetZ(void) const
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	return (float)m_DIMouseState.lZ;
