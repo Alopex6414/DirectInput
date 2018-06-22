@@ -88,10 +88,14 @@
     <ClInclude Include="DirectCommon.h" />
     <ClInclude Include="DirectInput.h" />
     <ClInclude Include="DirectThreadSafe.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectInput.cpp" />
     <ClCompile Include="DirectThreadSafe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectInput.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
